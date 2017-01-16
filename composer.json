@@ -33,7 +33,8 @@
         "zfcampus/zf-development-mode": "~2.0",
         "zfcampus/zf-apigility-admin-ui": "1.2.3",
         "doctrine/doctrine-orm-module": "0.*",
-        "api-skeletons/zf-oauth2-doctrine": "1.0.5"
+        "api-skeletons/zf-oauth2-doctrine": "1.0.5",
+        "phpunit/phpunit": "4.*"
     },
     "require-dev": {
         "zendframework/zftool": "dev-master",
