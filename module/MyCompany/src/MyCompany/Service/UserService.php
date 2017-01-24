@@ -28,6 +28,9 @@ class UserService implements UserServiceInterface
     const ERROR_USER_NOT_FOUND_CODE = 3;
     const ERROR_USER_NOT_FOUND_MSG = "Unuble to locate a user with the provided parameters";
 
+    const ERROR_INVALD_RESET_TOKEN_CODE = 4;
+    const ERROR_UINVALD_RESET_TOKEN_MSG = "Invalid reset token";
+
 
 
 
@@ -146,11 +149,38 @@ class UserService implements UserServiceInterface
 
     public function resetPassword($emailAddress, $resetToken, $newPasword)
     {
-        // TODO: Implement resetPassword() method.
+        $userObj = $this->entityManager->getRepository(User::class)
+            ->findOneBy(['email' => $emailAddress]);
+
+        if(! $userObj instanceof User ){
+            throw new \RuntimeException(self::ERROR_USER_NOT_FOUND_MSG,self::ERROR_USER_NOT_FOUND_CODE);
+        }
+
+        $expectedResetToken = $this->_getActivationCode($userObj);
+
+        if($expectedResetToken !== $resetToken){
+            throw new \RuntimeException(self::ERROR_UINVALD_RESET_TOKEN_MSG, self::ERROR_INVALD_RESET_TOKEN_CODE);
+        }
+
+        $bcrypt = new Bcrypt();
+        $bcrypt->setCost(14);
+        $userObj->setPassword($bcrypt->create($newPasword));
+
+        $this->entityManager->persist($userObj);
+        $this->entityManager->flush();
+
+        return $userObj;
     }
 
-    public function fetchUser($email)
+    public function fetchUser($emailAddress)
     {
-        // TODO: Implement fetchUser() method.
+        $userObj = $this->entityManager->getRepository(User::class)
+            ->findOneBy(['email' => $emailAddress]);
+
+        if(! $userObj instanceof User ){
+            throw new \RuntimeException(self::ERROR_USER_NOT_FOUND_MSG,self::ERROR_USER_NOT_FOUND_CODE);
+        }
+
+        return $userObj;
     }
 }

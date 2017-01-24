@@ -137,6 +137,13 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
 
     public function testFetchUser()
     {
+        $email = 'ruslankus@yahoo.com';
+        $password = 'abc1234';
+        $userObj = $this->userService->registerUser($email,$password);
+        $this->assertInstanceOf(User::class,$userObj);
+
+        $expectedOutput = $this->userService->fetchUser($email);
+        $this->assertInstanceOf(User::class, $expectedOutput);
 
     }
 
