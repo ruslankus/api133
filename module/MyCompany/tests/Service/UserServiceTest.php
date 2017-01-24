@@ -41,7 +41,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
         $qb->select('u');
         $qb->from(User::class,'u');
         $qb->andWhere($exp->like('u.email', ':email'));
-        $qb->setParameter('email','%unit_test%');
+        $qb->setParameter('email','%ruslankus%');
         $iterateResult = $qb->getQuery();
         $res = $iterateResult->iterate();
         foreach ($res as $usAsArr){
@@ -76,7 +76,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterUser()
     {
-        $email = 'ruslan+unit_test@test.lt';
+        $email = 'ruslankus@yahoo.com';
         $password = 'abc1234';
         $userObj = $this->userService->registerUser($email,$password);
         $this->assertInstanceOf(User::class,$userObj);
@@ -85,7 +85,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterUserMailAlreadyExistsException()
     {
-        $email = 'ruslan+unit_test@test.lt';
+        $email = 'ruslankus@yahoo.com';
         $password = 'abc1234';
         $userObj = $this->userService->registerUser($email,$password);
 
@@ -99,11 +99,39 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
 
     public function testForgotPassword()
     {
+        $email = 'ruslankus@yahoo.com';
+        $password = 'abc1234';
+        $userObj = $this->userService->registerUser($email,$password);
+        $this->assertInstanceOf(User::class,$userObj);
 
+        $responce = $this->userService->forgotPassword($email);
+
+        $this->assertInternalType('array',$responce);
+        $this->assertArrayHasKey('isMailSent',$responce);
+        $this->assertTrue($responce['isMailSent']);
     }
 
     public function testResetPassword()
     {
+
+        //first need to reister a new user
+        $email = 'ruslankus@yahoo.com';
+        $password = 'abc1234';
+        $userObj = $this->userService->registerUser($email,$password);
+        $this->assertInstanceOf(User::class,$userObj);
+        //after regiteration try yo change password
+
+        $newPassword = 'def4567';
+
+        $stringToHash = $userObj->getId() .
+            $userObj->getEmail() .
+            $userObj->getPassword() .
+            $userObj->getCreatedAt()->getTimestamp();
+        $resetToken = hash('sha256',$stringToHash);
+
+
+        $userResetObj = $this->userService->resetPassword($email,$resetToken, $newPassword);
+        $this->assertInstanceOf(User::class, $userResetObj);
 
     }
 

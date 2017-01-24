@@ -14,6 +14,7 @@ services:
 
   api-old:
       build: .
+      image: api-old
       environment:
           XDEBUG_CONFIG: remote_host=192.168.1.13
       network_mode: "bridge"
