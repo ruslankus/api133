@@ -40,4 +40,26 @@ return array(
             ),
         ),
     ),
+    'Identity\\V1\\Rest\\FinishPasswordReset\\Controller' => array(
+        'description' => 'Finish Reset Password process',
+        'collection' => array(
+            'POST' => array(
+                'request' => '{
+   "token": "",
+   "newPassword": "",
+   "email": "email address"
+}',
+                'response' => '{
+   "_links": {
+       "self": {
+           "href": "/account/finish-password-reset[/:finish_password_reset_id]"
+       }
+   }
+   "token": "",
+   "newPassword": "",
+   "email": "email address"
+}',
+            ),
+        ),
+    ),
 );

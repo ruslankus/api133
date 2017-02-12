@@ -5,6 +5,7 @@ use MyCompany\Bootstrap;
 use MyCompany\Entity\User;
 use MyCompany\Service\UserService;
 use PHPUnit_Framework_TestCase;
+use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 require_once(__DIR__ . '/../bootstrap.php');
 

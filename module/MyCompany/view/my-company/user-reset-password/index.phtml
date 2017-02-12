@@ -1,0 +1,175 @@
+<?php
+$request = $this->requestParams;
+
+?>
+<!doctype html>
+<html lang="en">
+<head>
+    <?php
+    echo $this->headTitle('Reset password');
+    echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0');
+    echo $this->headLink(array('rel' => 'icon', 'type' => 'image/png', 'href' => $this->basePath('/img/favicon.png')))
+    ->prependStylesheet($this->basePath('/zf-apigility/css/main.min.css'))
+    ->prependStylesheet($this->basePath('/zf-apigility/css/bootstrap.min.css'));
+    echo $this->headScript()
+    ->prependFile($this->basePath('/zf-apigility/js/bootstrap.min.js'))
+    ->prependFile($this->basePath('/zf-apigility/js/jquery.min.js'));
+
+    ?>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    var requestData = <?php echo json_encode($request);?>
+
+jQuery(document).ready(function () {
+
+    $('#reset-password-form input[name="token"]').val(requestData.token);
+    $('#reset-password-form input[name="email"]').val(requestData.email);
+
+    $('#reset-password-form').submit(function(e){
+        e.preventDefault();
+
+        var formData = new FormData($(this)[0]);
+
+        var pass1 = $('#password1').val();
+        var pass2 = $('#password2').val();
+
+        console.log(pass1,pass2);
+        console.log(formData);
+        //check pasword
+        if(pass1 !== pass2 ){
+
+            $('div.console').text('Passwords must match!');
+            $('div.console').removeClass('hidden');
+            return false;
+        }
+
+        $.ajax({
+           url: '/account/finish-password-reset',
+            type : 'POST',
+            contentType : false,
+            data : formData,
+            processData : false,
+            error : function(data){
+
+               if(typeof data.responseText !== "undefined" ) {
+
+                   var responseJSON = $.parseJSON(data.responseText);
+                   var consoleLog = "";
+
+                   if (typeof responseJSON.validation_messages !== "undefined") {
+                       for (var i in responseJSON.validation_messages) {
+
+                           consoleLog = consoleLog + "<br />" + i;
+
+                           for (var n in responseJSON.validation_messages[i]) {
+                               consoleLog = consoleLog + ' validator: ' + n + ' - ' + responseJSON.validation_messages[i][n]
+                           }
+                       }
+
+                   }else{
+                       var consoleLog = responseJSON.detail;
+
+                   }
+
+                   $('div.console').html(consoleLog);
+
+               }else{
+                   var errorMessage = JSON.stringify(data);
+
+               }
+
+               $('div.console').removeClass('hidden');
+               console.log(responseJSON);
+
+            },//function
+
+            beforeSend : function () {
+                $('div.console').html("Attempting to reset password");
+                $('div.console').removeClass('hidden');
+            },
+
+            success : function (data) {
+                $('div.console').html(JSON.stringify(data));
+                $('div.console').removeClass('hidden');
+
+                window.location.replace('http://localhost/log-me-in');
+            }
+        });
+
+
+
+        return false;
+    });
+
+
+})//document ready
+
+
+
+</script>
+
+
+<div class="container">
+    <div class="row">
+        <div class="console alert alert-warning hidden">
+
+        </div><!--console -->
+
+        <form class="form-horizontal" id="reset-password-form" >
+
+            <input type="hidden" name="token" value="" >
+            <input type="hidden" name="email" value="" >
+
+            <fieldset>
+                <legend>Password reset</legend>
+
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="password1">
+                        New password
+                    </label>
+
+                    <div class="col-md-4">
+                        <input id="password1" name="newPassword" type="password"
+                               placeholder="Your new password" class="form-control input-md" required="">
+                        <span class="help-block">Must be at least 5 characters long</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="password2">
+                        New password(Reapeat)
+                    </label>
+
+                    <div class="col-md-4">
+                        <input id="password2" name="newPassword" type="password"
+                               placeholder="Your new password(again)" class="form-control input-md" required="">
+                        <span class="help-block">Same as above</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="submit">
+
+                    </label>
+                    <div class="col-md-4">
+                        <button id="submit" name="submit" class="btn btn-primary">
+                            Update my password
+                        </button>
+                    </div>
+                </div>
+
+
+            </fieldset>
+
+        </form>
+
+
+    </div>
+</div>
+
+</body>
+</html>
